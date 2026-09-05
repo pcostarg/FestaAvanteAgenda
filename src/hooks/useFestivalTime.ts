@@ -40,9 +40,9 @@ export function getFestivalDayFromDate(date: Date): FestivalDay {
   const d = String(effectiveDate.getDate()).padStart(2, '0');
   const dateStr = `${y}-${m}-${d}`;
 
-  if (dateStr === '2025-09-05') return 'sexta';
-  if (dateStr === '2025-09-06') return 'sabado';
-  if (dateStr === '2025-09-07') return 'domingo';
+  if (dateStr === '2025-09-05' || dateStr === '2026-09-04') return 'sexta';
+  if (dateStr === '2025-09-06' || dateStr === '2026-09-05') return 'sabado';
+  if (dateStr === '2025-09-07' || dateStr === '2026-09-06') return 'domingo';
 
   // Day of week: Friday (5), Saturday (6), Sunday (0)
   const dayOfWeek = effectiveDate.getDay();

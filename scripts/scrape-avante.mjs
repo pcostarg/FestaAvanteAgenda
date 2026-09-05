@@ -23,25 +23,37 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '..');
-const OUTPUT_FILE = path.join(ROOT_DIR, 'src', 'data', 'program.json');
-
-const USER_AGENT =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36';
-
-const URLS = [
-  { name: 'programa', url: 'https://www.festadoavante.pcp.pt/2025/programa' },
-  { name: 'musica', url: 'https://www.festadoavante.pcp.pt/2025/musica' },
-];
 
 // CLI argument parsing
 const args = process.argv.slice(2);
 const isStrict = args.includes('--strict');
 const isDryRun = args.includes('--dry-run');
+
+const yearArgIdx = args.indexOf('--year');
+const YEAR =
+  yearArgIdx !== -1 && args[yearArgIdx + 1]
+    ? args[yearArgIdx + 1]
+    : '2026';
+
+const outArgIdx = args.indexOf('--out');
+const OUTPUT_FILE =
+  outArgIdx !== -1 && args[outArgIdx + 1]
+    ? path.resolve(args[outArgIdx + 1])
+    : path.join(ROOT_DIR, 'src', 'data', 'program.json');
+
 const timeoutArgIdx = args.indexOf('--timeout');
 const TIMEOUT_MS =
   timeoutArgIdx !== -1 && args[timeoutArgIdx + 1]
     ? parseInt(args[timeoutArgIdx + 1], 10)
     : 8000;
+
+const USER_AGENT =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36';
+
+const URLS = [
+  { name: 'programa', url: `https://www.festadoavante.pcp.pt/${YEAR}/programa` },
+  { name: 'musica', url: `https://www.festadoavante.pcp.pt/${YEAR}/musica` },
+];
 
 /**
  * Robust fetch with AbortController timeout
@@ -221,17 +233,17 @@ function mapCategory(tipos, espaco) {
  * Maps festival day, dayLabel, dayCode, and calendar date.
  */
 function mapDay(dateStr) {
-  const d = dateStr.slice(0, 10);
-  if (d === '2025-09-05') {
-    return { day: 'sexta', dayLabel: 'Sexta 5', dayCode: 'fri', date: '2025-09-05' };
+  const d = (dateStr || '').replace(/\//g, '-').slice(0, 10);
+  if (d === '2026-09-04' || d === '2025-09-05') {
+    return { day: 'sexta', dayLabel: d.startsWith('2026') ? 'Sexta 4' : 'Sexta 5', dayCode: 'fri', date: d };
   }
-  if (d === '2025-09-06') {
-    return { day: 'sabado', dayLabel: 'Sábado 6', dayCode: 'sat', date: '2025-09-06' };
+  if (d === '2026-09-05' || d === '2025-09-06') {
+    return { day: 'sabado', dayLabel: d.startsWith('2026') ? 'Sábado 5' : 'Sábado 6', dayCode: 'sat', date: d };
   }
-  if (d === '2025-09-07') {
-    return { day: 'domingo', dayLabel: 'Domingo 7', dayCode: 'sun', date: '2025-09-07' };
+  if (d === '2026-09-06' || d === '2025-09-07') {
+    return { day: 'domingo', dayLabel: d.startsWith('2026') ? 'Domingo 6' : 'Domingo 7', dayCode: 'sun', date: d };
   }
-  return { day: 'sexta', dayLabel: 'Sexta 5', dayCode: 'fri', date: '2025-09-05' };
+  return { day: 'sexta', dayLabel: 'Sexta 4', dayCode: 'fri', date: d || '2026-09-04' };
 }
 
 /**
@@ -269,7 +281,7 @@ function festivalMinutesToTime(mins) {
  */
 async function run() {
   console.log('='.repeat(65));
-  console.log('  🎪 FESTA DO AVANTE! 2025 — PROGRAM SCRAPER & DATASET PIPELINE');
+  console.log(`  🎪 FESTA DO AVANTE! ${YEAR} — PROGRAM SCRAPER & DATASET PIPELINE`);
   console.log('='.repeat(65));
 
   const rawArticlesMap = new Map();
@@ -282,15 +294,20 @@ async function run() {
       console.log(`   ✓ Successfully extracted ${articles.length} events from /${item.name}`);
 
       for (const art of articles) {
-        if (!rawArticlesMap.has(art.id)) {
-          rawArticlesMap.set(art.id, { ...art });
+        // Normalize ID (e.g. '1814_0' -> '1814') so programa & musica entries merge cleanly
+        const canonicalId = art.id.replace(/_\d+$/, '');
+        const normalizedArt = { ...art, id: canonicalId };
+
+        if (!rawArticlesMap.has(canonicalId)) {
+          rawArticlesMap.set(canonicalId, normalizedArt);
         } else {
           // Merge metadata for duplicate entries across programa & musica
-          const existing = rawArticlesMap.get(art.id);
+          const existing = rawArticlesMap.get(canonicalId);
           existing.tipos = Array.from(new Set([...existing.tipos, ...art.tipos]));
           if (!existing.img && art.img) existing.img = art.img;
           if (!existing.maisEspaco && art.maisEspaco) existing.maisEspaco = art.maisEspaco;
           if ((!existing.espaco || existing.espaco === '') && art.espaco) existing.espaco = art.espaco;
+          if ((!existing.link || existing.link === '') && art.link) existing.link = art.link;
         }
       }
     } catch (err) {

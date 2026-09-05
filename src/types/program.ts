@@ -19,7 +19,13 @@ export type FestivalDayCode = 'fri' | 'sat' | 'sun';
 /**
  * UI display labels for festival days
  */
-export type DayLabel = 'Sexta 5' | 'Sábado 6' | 'Domingo 7';
+export type DayLabel =
+  | 'Sexta 4'
+  | 'Sexta 5'
+  | 'Sábado 5'
+  | 'Sábado 6'
+  | 'Domingo 6'
+  | 'Domingo 7';
 
 /**
  * Primary 9 anchor stages required for Grelha de Palcos matrix view

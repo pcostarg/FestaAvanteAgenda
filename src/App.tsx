@@ -285,7 +285,7 @@ export const App: React.FC = () => {
           if (activeView !== 'lista') handleViewChange('lista');
         }}
         isOffline={isOffline}
-        savedCount={schedule.savedCount}
+        savedCount={schedule.unseenSavedCount}
         searchInputRef={searchInputRef}
         onOpenExport={() => setIsExportOpen(true)}
         onOpenImport={() => setIsImportOpen(true)}
@@ -378,7 +378,7 @@ export const App: React.FC = () => {
       <BottomNav
         activeView={activeView}
         onViewChange={handleViewChange}
-        savedCount={schedule.savedCount}
+        savedCount={schedule.unseenSavedCount}
       />
 
       {/* Sharing Modals */}

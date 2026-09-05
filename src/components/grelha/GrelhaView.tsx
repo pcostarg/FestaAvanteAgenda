@@ -351,7 +351,7 @@ export const GrelhaView: React.FC<GrelhaViewProps> = ({
           className="overflow-auto max-h-[calc(100vh-14rem)] min-h-[420px] relative"
         >
           {/* Real-time AGORA Needle Canvas Overlay */}
-          <div className="absolute top-0 bottom-0 left-44 md:left-48 w-[2400px] pointer-events-none z-20">
+          <div className="absolute top-0 bottom-0 left-28 sm:left-36 md:left-40 w-[2400px] pointer-events-none z-20">
             <AgoraNeedle
               currentTime={currentTime}
               percentage={agoraPercentage}

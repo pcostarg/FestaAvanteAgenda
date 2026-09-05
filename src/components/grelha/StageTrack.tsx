@@ -92,18 +92,18 @@ export const StageTrack: React.FC<StageTrackProps> = ({
 
   return (
     <div className="flex border-b border-border-subtle hover:bg-surface-card/40 transition-colors">
-      {/* Sticky Stage Label Column */}
-      <div className="sticky left-0 z-10 bg-surface border-r border-border-subtle w-44 md:w-48 shrink-0 p-3 flex flex-col justify-center">
-        <span className="font-display font-bold text-xs md:text-sm text-text-primary truncate">
+      {/* Sticky Stage Label Column (compact width & vertical multi-line wrap so stage name is always readable on horizontal scroll) */}
+      <div className="sticky left-0 z-10 bg-surface border-r border-border-subtle w-28 sm:w-36 md:w-40 shrink-0 p-2 sm:p-2.5 flex flex-col justify-center select-none shadow-sm">
+        <span className="font-display font-bold text-[11px] sm:text-xs md:text-sm text-text-primary leading-tight break-words">
           {stageName}
         </span>
-        <div className="flex items-center gap-1.5 mt-0.5">
-          <span className="text-[11px] text-text-muted">
+        <div className="flex items-center gap-1 mt-1 flex-wrap">
+          <span className="text-[10px] sm:text-[11px] text-text-muted">
             {events.length} {events.length === 1 ? 'atuação' : 'atuações'}
           </span>
           {numLanes > 1 && (
-            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-surface-container text-text-secondary">
-              {numLanes} pistas
+            <span className="text-[8px] sm:text-[9px] font-bold px-1 py-0.2 rounded bg-surface-container text-text-secondary">
+              {numLanes}p
             </span>
           )}
         </div>

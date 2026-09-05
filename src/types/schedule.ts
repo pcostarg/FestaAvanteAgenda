@@ -52,6 +52,8 @@ export interface UseScheduleReturn {
   seen: string[];
   /** Total count of favorited events */
   savedCount: number;
+  /** Count of favorited events not yet marked as seen */
+  unseenSavedCount: number;
   /** Timestamp of last update */
   updatedAt: number;
   /** Toggles an event in or out of favorites */

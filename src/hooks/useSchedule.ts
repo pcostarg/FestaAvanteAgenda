@@ -56,10 +56,15 @@ export function useSchedule(): UseScheduleReturn {
     [favoriteSet, getConflictsForDay]
   );
 
+  const unseenSavedCount = useMemo(() => {
+    return state.favorites.filter((id) => !seenSet.has(id)).length;
+  }, [state.favorites, seenSet]);
+
   return {
     favorites: state.favorites,
     seen: state.seen,
     savedCount: state.favorites.length,
+    unseenSavedCount,
     updatedAt: state.updatedAt,
     toggleFavorite,
     toggleSeen,

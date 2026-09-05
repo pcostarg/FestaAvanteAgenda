@@ -7,9 +7,9 @@ export const TimeAxisHeader: React.FC = () => {
 
   return (
     <div className="sticky top-0 z-20 bg-surface/95 backdrop-blur border-b border-border-subtle flex h-10 select-none">
-      {/* Sticky Corner Cell */}
-      <div className="sticky left-0 z-30 bg-surface border-r border-border-subtle w-44 md:w-48 shrink-0 flex items-center px-4">
-        <span className="text-xs font-bold text-text-muted uppercase tracking-wider">
+      {/* Sticky Corner Cell (matches compact width of stage tracks) */}
+      <div className="sticky left-0 z-30 bg-surface border-r border-border-subtle w-28 sm:w-36 md:w-40 shrink-0 flex items-center px-2.5 sm:px-3">
+        <span className="text-[11px] sm:text-xs font-bold text-text-muted uppercase tracking-wider">
           Palco
         </span>
       </div>

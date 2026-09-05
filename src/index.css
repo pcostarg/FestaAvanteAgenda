@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    background-color: #0B0D0F;
+    color: #F8FAFC;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background-color: #0B0D0F;
+    color: #F8FAFC;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: #D32F2F;
+    color: #F8FAFC;
+  }
+
+  /* Optimize touch responsiveness and eliminate mobile 300ms tap delay */
+  button,
+  a,
+  input,
+  select {
+    touch-action: manipulation;
+  }
+}
+
+@layer utilities {
+  /* Safe area inset paddings for mobile devices with notches or gesture bars */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pl-safe {
+    padding-left: env(safe-area-inset-left, 0px);
+  }
+  .pr-safe {
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
+  /* Tabular numbers for non-jitter time codes */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Custom subtle scrollbar for timeline matrix horizontal scrolling */
+  .scrollbar-thin::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #111316;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #282E38;
+    border-radius: 9999px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #3F4756;
+  }
+
+  /* Utility to hide scrollbars while maintaining scrollability */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

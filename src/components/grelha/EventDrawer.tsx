@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import type { FestivalEvent } from '../../types/program';
 import type { ConflictResolutionAction } from '../../types/schedule';
 import { timeToFestivalMinutes } from '../../utils/conflictDetector';
-import { X, Star, CheckCircle2, AlertTriangle, Clock, MapPin } from 'lucide-react';
+import { X, Star, CheckCircle2, AlertTriangle, Clock, MapPin, ExternalLink } from 'lucide-react';
 
 export interface EventDrawerProps {
   event: FestivalEvent | null;
@@ -143,6 +143,22 @@ export const EventDrawer: React.FC<EventDrawerProps> = ({
               ? event.description
               : 'Sem descrição disponível.'}
           </div>
+
+          {/* External official link to festival webpage if present in JSON */}
+          {event.url && (
+            <div className="mt-4 pt-3 border-t border-border-subtle/60">
+              <a
+                href={event.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-xs font-semibold text-brand-crimson hover:text-brand-crimson-bright hover:underline transition-colors group"
+                aria-label={`Ver ${event.title} no site da Festa do Avante`}
+              >
+                <span>Ver página oficial do evento</span>
+                <ExternalLink className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}

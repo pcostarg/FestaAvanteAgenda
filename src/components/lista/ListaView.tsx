@@ -6,7 +6,7 @@ import { CategoryFilterChips } from './CategoryFilterChips';
 import { TimeBlockSection } from './TimeBlockSection';
 import { normalizeDayKey, timeToFestivalMinutes } from '../../utils/conflictDetector';
 import { getFestivalDayFromDate } from '../../hooks/useFestivalTime';
-import { Search, EyeOff, RotateCcw, Sparkles } from 'lucide-react';
+import { Search, EyeOff, RotateCcw, Sparkles, X } from 'lucide-react';
 
 export interface ListaViewProps {
   events?: FestivalEvent[];
@@ -199,6 +199,30 @@ export const ListaView: React.FC<ListaViewProps> = ({
           onDayChange={handleDaySwitch}
           counts={dayCounts}
         />
+      </div>
+
+      {/* Mobile Search Bar (Directly accessible on mobile when in Lista mode) */}
+      <div className="relative lg:hidden flex items-center">
+        <div className="absolute left-3.5 pointer-events-none text-text-muted flex items-center">
+          <Search className="w-4 h-4" />
+        </div>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => onSearchChange?.(e.target.value)}
+          placeholder="Pesquisar artistas, palcos, categorias..."
+          className="w-full h-11 pl-10 pr-10 text-sm bg-surface-card border border-border-subtle rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-border-highlight focus:ring-1 focus:ring-brand-crimson transition-all shadow-sm"
+          aria-label="Pesquisar programação na lista"
+        />
+        {searchQuery && (
+          <button
+            onClick={() => onSearchChange?.('')}
+            className="absolute right-3 p-1 text-text-muted hover:text-text-primary rounded-full hover:bg-surface-overlay transition-colors"
+            aria-label="Limpar pesquisa"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Category Ribbon */}

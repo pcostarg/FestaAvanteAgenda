@@ -28,9 +28,62 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenExport,
   onOpenImport,
 }) => {
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = React.useState(false);
+  const mobileInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  const handleOpenMobileSearch = () => {
+    setIsMobileSearchOpen(true);
+    if (activeView !== 'lista') {
+      onViewChange('lista');
+    }
+    setTimeout(() => {
+      mobileInputRef.current?.focus();
+    }, 50);
+  };
+
+  const handleCloseMobileSearch = () => {
+    setIsMobileSearchOpen(false);
+  };
+
   return (
     <header className="fixed top-0 inset-x-0 z-40 h-16 md:h-20 bg-surface-card/90 backdrop-blur-md border-b border-border-subtle shadow-bar-top transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between gap-2 sm:gap-4">
+      {/* Mobile Search Overlay Bar */}
+      {isMobileSearchOpen ? (
+        <div className="lg:hidden max-w-7xl mx-auto px-3 sm:px-6 h-full flex items-center gap-2">
+          <div className="relative flex-1 flex items-center">
+            <div className="absolute left-3 pointer-events-none text-text-muted flex items-center">
+              <Search className="w-4 h-4" />
+            </div>
+            <input
+              ref={mobileInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder="Pesquisar artistas, palcos..."
+              className="w-full h-10 pl-9 pr-10 text-sm bg-surface-container-high border border-border-subtle rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-border-highlight focus:ring-1 focus:ring-brand-crimson transition-all"
+              aria-label="Pesquisar programação"
+              autoFocus
+            />
+            {searchQuery && (
+              <button
+                onClick={() => onSearchChange('')}
+                className="absolute right-2.5 p-1 text-text-muted hover:text-text-primary rounded-full hover:bg-surface-overlay"
+                aria-label="Limpar texto de pesquisa"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          <button
+            onClick={handleCloseMobileSearch}
+            className="p-2 text-xs font-semibold text-text-secondary hover:text-text-primary rounded-xl bg-surface-container border border-border-subtle shrink-0"
+            aria-label="Fechar barra de pesquisa"
+          >
+            Fechar
+          </button>
+        </div>
+      ) : (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between gap-2 sm:gap-4">
         
         {/* Left: Festival Emblem & Identity */}
         <div 
@@ -175,10 +228,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Mobile Search Button (reveals or switches to search) */}
           <button
-            onClick={() => {
-              if (activeView !== 'lista') onViewChange('lista');
-              onSearchFocus?.();
-            }}
+            onClick={handleOpenMobileSearch}
             className="lg:hidden p-2 text-text-secondary hover:text-text-primary rounded-xl bg-surface-container border border-border-subtle active:scale-95 transition-transform"
             aria-label="Abrir pesquisa"
           >
@@ -208,7 +258,8 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-      </div>
+        </div>
+      )}
     </header>
   );
 };

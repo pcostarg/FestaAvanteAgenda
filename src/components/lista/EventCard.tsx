@@ -101,7 +101,7 @@ export const EventCard: React.FC<EventCardProps> = ({
             </div>
 
             <h3
-              className={`font-display font-bold text-base md:text-lg tracking-tight truncate ${
+              className={`font-display font-bold text-base md:text-lg tracking-tight leading-snug break-words ${
                 isSeen ? 'line-through text-text-muted' : 'text-text-primary'
               }`}
             >

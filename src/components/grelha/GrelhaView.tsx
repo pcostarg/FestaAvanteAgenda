@@ -348,43 +348,45 @@ export const GrelhaView: React.FC<GrelhaViewProps> = ({
         <div
           ref={scrollContainerRef}
           onScroll={handleGridScroll}
-          className="overflow-auto max-h-[calc(100vh-14rem)] min-h-[420px] relative"
+          className="overflow-auto max-h-[calc(100vh-14rem)] min-h-[420px]"
         >
-          {/* Real-time AGORA Needle Canvas Overlay */}
-          <div className="absolute top-0 bottom-0 left-28 sm:left-36 md:left-40 w-[2400px] pointer-events-none z-20">
-            <AgoraNeedle
-              currentTime={currentTime}
-              percentage={agoraPercentage}
-              isActive={isOperatingWindow && isToday}
-            />
-          </div>
-
-          {/* Sticky Time Ruler */}
-          <TimeAxisHeader />
-
-          {/* Stage Tracks */}
-          <div className="divide-y divide-border-subtle/50">
-            {visibleStages.map((stage) => (
-              <StageTrack
-                key={stage}
-                stageName={stage}
-                events={eventsByStage.get(stage) || []}
-                isFavorite={isFavorite}
-                isSeen={isSeen}
-                hasConflict={(id) => hasConflict(id, selectedDay, events)}
-                currentMinutes={currentMinutes}
-                isToday={isToday}
-                onSelectEvent={handleSelectEvent}
-                onToggleFavorite={(e, id) => {
-                  e.stopPropagation();
-                  toggleFavorite(id);
-                }}
-                onToggleSeen={(e, id) => {
-                  e.stopPropagation();
-                  toggleSeen(id);
-                }}
+          <div className="relative min-w-max">
+            {/* Real-time AGORA Needle Canvas Overlay */}
+            <div className="absolute top-0 bottom-0 left-28 sm:left-36 md:left-40 w-[2400px] pointer-events-none z-20">
+              <AgoraNeedle
+                currentTime={currentTime}
+                percentage={agoraPercentage}
+                isActive={isOperatingWindow && isToday}
               />
-            ))}
+            </div>
+
+            {/* Sticky Time Ruler */}
+            <TimeAxisHeader />
+
+            {/* Stage Tracks */}
+            <div className="divide-y divide-border-subtle/50 min-w-max">
+              {visibleStages.map((stage) => (
+                <StageTrack
+                  key={stage}
+                  stageName={stage}
+                  events={eventsByStage.get(stage) || []}
+                  isFavorite={isFavorite}
+                  isSeen={isSeen}
+                  hasConflict={(id) => hasConflict(id, selectedDay, events)}
+                  currentMinutes={currentMinutes}
+                  isToday={isToday}
+                  onSelectEvent={handleSelectEvent}
+                  onToggleFavorite={(e, id) => {
+                    e.stopPropagation();
+                    toggleFavorite(id);
+                  }}
+                  onToggleSeen={(e, id) => {
+                    e.stopPropagation();
+                    toggleSeen(id);
+                  }}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>

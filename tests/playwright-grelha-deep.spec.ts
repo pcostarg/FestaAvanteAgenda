@@ -45,28 +45,28 @@ test.describe('Grelha View In-Depth Browser Verification', () => {
     await page.waitForTimeout(200);
 
     // Get stage names under "Todos"
-    const stagesTodos = await page.locator('span.font-display.font-bold.truncate').allTextContents();
+    const stagesTodos = await page.locator('span.font-display.font-bold.break-words').allTextContents();
     console.log(`Saturday "Todos" stage count: ${stagesTodos.length}`);
     expect(stagesTodos.length).toBe(26);
 
     // Click "Palcos Principais"
     await page.getByRole('button', { name: /Palcos Principais/i }).click();
     await page.waitForTimeout(200);
-    const stagesPrincipais = await page.locator('span.font-display.font-bold.truncate').allTextContents();
+    const stagesPrincipais = await page.locator('span.font-display.font-bold.break-words').allTextContents();
     console.log(`Saturday "Principais" stage count: ${stagesPrincipais.length}`);
     expect(stagesPrincipais.length).toBe(9);
 
     // Click "Espaços Culturais"
     await page.getByRole('button', { name: /Espaços Culturais/i }).click();
     await page.waitForTimeout(200);
-    const stagesCulturais = await page.locator('span.font-display.font-bold.truncate').allTextContents();
+    const stagesCulturais = await page.locator('span.font-display.font-bold.break-words').allTextContents();
     console.log(`Saturday "Culturais" stage count: ${stagesCulturais.length}`, stagesCulturais);
     expect(stagesCulturais.length).toBe(5);
 
     // Click "Pavilhões Regionais"
     await page.getByRole('button', { name: /Pavilhões Regionais/i }).click();
     await page.waitForTimeout(200);
-    const stagesRegionais = await page.locator('span.font-display.font-bold.truncate').allTextContents();
+    const stagesRegionais = await page.locator('span.font-display.font-bold.break-words').allTextContents();
     console.log(`Saturday "Regionais" stage count: ${stagesRegionais.length}`, stagesRegionais);
     expect(stagesRegionais.length).toBe(12);
   });

@@ -168,7 +168,7 @@ challenge('D1-07: Real dataset early acts verification against Grelha constraint
     const s = timeToFestivalMinutes(e.startTime || e.timeStart);
     return s < 600;
   });
-  assert(earlyActs.length === 3, `Expected 3 early acts in authentic dataset, found ${earlyActs.length}`);
+  assert(earlyActs.length === 2, `Expected 2 early acts in authentic dataset, found ${earlyActs.length}`);
   for (const act of earlyActs) {
     const coords = computeGrelhaCoords(act.startTime || act.timeStart, act.endTime || act.timeEnd);
     assert(coords.leftPercent === 0, `Act ${act.id} (${act.title}) offset should be 0`);

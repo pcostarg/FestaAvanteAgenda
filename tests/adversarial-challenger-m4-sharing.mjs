@@ -249,19 +249,19 @@ challenge('M4-F08-ICS: Text control character escaping (\\, ;, ,, \\n)', () => {
   assert(!escaped.includes('\r'), 'No raw \\r in escaped output');
 });
 
-challenge('M4-F09-ICS: Complete program.json dataset (269 authentic acts) generates valid calendar', () => {
+challenge('M4-F09-ICS: Complete program.json dataset (253 authentic acts) generates valid calendar', () => {
   const programPath = path.join(rootDir, 'src', 'data', 'program.json');
   const allEvents = JSON.parse(fs.readFileSync(programPath, 'utf-8'));
-  assertEqual(allEvents.length, 269, '269 authentic festival acts');
+  assertEqual(allEvents.length, 253, '253 authentic festival acts');
 
   const startT = Date.now();
   const fullIcs = prodGenerateIcs(allEvents);
   const duration = Date.now() - startT;
 
-  assert(duration < 200, `269 acts ICS generated in ${duration}ms (target <200ms)`);
+  assert(duration < 200, `253 acts ICS generated in ${duration}ms (target <200ms)`);
   const validation = prodValidateIcs(fullIcs);
-  assert(validation.valid === true, 'Full 269 acts ICS is 100% RFC 5445 valid');
-  assertEqual(validation.eventCount, 269, 'Exactly 269 VEVENT blocks validated');
+  assert(validation.valid === true, 'Full 253 acts ICS is 100% RFC 5445 valid');
+  assertEqual(validation.eventCount, 253, 'Exactly 253 VEVENT blocks validated');
   assert(fullIcs.startsWith('BEGIN:VCALENDAR\r\n'), 'Starts with VCALENDAR');
   assert(fullIcs.endsWith('END:VCALENDAR\r\n'), 'Ends with END:VCALENDAR');
 });

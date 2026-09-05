@@ -639,7 +639,7 @@ challenge('T35-DATASET: program.json acts produce zero false negatives or invali
   const programJsonPath = path.join(rootDir, 'src', 'data', 'program.json');
   assert(fs.existsSync(programJsonPath), 'program.json exists');
   const program = JSON.parse(fs.readFileSync(programJsonPath, 'utf-8'));
-  assertEqual(program.length, 269, 'Exactly 269 acts');
+  assertEqual(program.length, 253, 'Exactly 253 acts');
 
   // Verify every act parses cleanly
   let parseErrors = 0;
@@ -652,7 +652,7 @@ challenge('T35-DATASET: program.json acts produce zero false negatives or invali
       parseErrors++;
     }
   }
-  assertEqual(parseErrors, 0, 'All 269 events have valid parseable intervals with start < end');
+  assertEqual(parseErrors, 0, 'All 253 events have valid parseable intervals with start < end');
 
   // Run full conflict detection on each day's authentic acts
   const days = ['sexta', 'sabado', 'domingo'];

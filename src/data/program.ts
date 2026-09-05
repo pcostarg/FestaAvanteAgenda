@@ -2,7 +2,7 @@
  * Festa do Avante! 2025 - Festival Program Dataset & Lookup Engine
  * File: src/data/program.ts
  *
- * Strongly typed export of the complete 2025 festival schedule (269 events),
+ * Strongly typed export of the complete 2025 festival schedule (253 events),
  * pre-indexed lookup maps, and query helper functions.
  */
 
@@ -19,7 +19,7 @@ import type {
 import { PRIMARY_STAGES, CATEGORIES } from '../types/program';
 
 /**
- * The authoritative array of all 269 festival events, typed as FestivalEvent[].
+ * The authoritative array of all 253 festival events, typed as FestivalEvent[].
  */
 export const FESTIVAL_EVENTS: FestivalEvent[] = rawEvents as unknown as FestivalEvent[];
 

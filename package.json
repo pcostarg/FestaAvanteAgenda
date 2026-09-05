@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "scrape": "node scripts/scrape-avante.mjs",
     "typecheck": "tsc -b --noEmit",
-    "test": "node tests/e2e/runner.mjs"
+    "test": "node tests/e2e/runner.mjs",
+    "test:playwright": "playwright test"
   },
   "dependencies": {
     "html5-qrcode": "^2.3.8",
@@ -21,6 +22,7 @@
     "react-router-dom": "^7.1.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/node": "^22.13.0",
     "@types/qrcode": "^1.5.5",
     "@types/react": "^19.2.0",

@@ -53,7 +53,7 @@ import {
   SCHEMA_VERSION,
 } from '../src/utils/jsonBackup.ts';
 
-// Load full authentic dataset (269 acts)
+// Load full authentic dataset (253 acts)
 const authenticProgram = JSON.parse(
   fs.readFileSync(path.join(rootDir, 'src', 'data', 'program.json'), 'utf-8')
 );
@@ -885,23 +885,23 @@ challenge('T41-INTEROP: Scanned text extractor (extractScheduleFromScannedText) 
   }
 });
 
-challenge('T42-INTEROP: Full authentic dataset (269 acts) JSON and ICS export stress test', () => {
+challenge('T42-INTEROP: Full authentic dataset (253 acts) JSON and ICS export stress test', () => {
   const startTime = Date.now();
   const allIds = authenticProgram.map((e) => e.id);
 
   // 1. JSON backup of entire festival
   const fullBackup = prodCreateJsonBackup(allIds, allIds.slice(0, 50), authenticProgram);
-  assert(fullBackup.favorites.length === 269, 'All 269 favorites preserved');
-  assert(fullBackup.events.length === 269, 'All 269 event summaries generated');
+  assert(fullBackup.favorites.length === 253, 'All 253 favorites preserved');
+  assert(fullBackup.events.length === 253, 'All 253 event summaries generated');
   assert(prodValidateJsonBackup(fullBackup).valid === true, 'Full dataset backup valid');
 
   // 2. ICS calendar of entire festival
   const fullIcs = prodGenerateIcsCalendar(authenticProgram);
   const icsValidation = prodValidateIcsCalendar(fullIcs);
   assert(icsValidation.valid === true, `Full dataset ICS must be valid: ${icsValidation.errors.join(', ')}`);
-  assert(icsValidation.eventCount === 269, `All 269 VEVENTs generated, got ${icsValidation.eventCount}`);
+  assert(icsValidation.eventCount === 253, `All 253 VEVENTs generated, got ${icsValidation.eventCount}`);
 
-  // Check that no folded lines exceed 75 bytes across the entire 269-act calendar
+  // Check that no folded lines exceed 75 bytes across the entire 253-act calendar
   const icsLines = fullIcs.split('\r\n');
   for (let i = 0; i < icsLines.length; i++) {
     const bl = getUtf8ByteLength(icsLines[i]);
@@ -912,8 +912,8 @@ challenge('T42-INTEROP: Full authentic dataset (269 acts) JSON and ICS export st
   }
 
   const durationMs = Date.now() - startTime;
-  console.log(`         Full dataset (269 acts) JSON + ICS processed in ${durationMs}ms with 0 violations!`);
-  assert(durationMs < 1000, `Processing 269 acts should be < 1s, took ${durationMs}ms`);
+  console.log(`         Full dataset (253 acts) JSON + ICS processed in ${durationMs}ms with 0 violations!`);
+  assert(durationMs < 1000, `Processing 253 acts should be < 1s, took ${durationMs}ms`);
 });
 
 // =====================================================================

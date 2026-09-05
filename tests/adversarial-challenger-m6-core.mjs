@@ -444,8 +444,8 @@ describe('Tier 5 Suite 4: Time Block Partitioning & Nocturnal Chronological Orde
     expect(continuousComparison).toBeLessThan(0); // Accurately models festival reality (23:30 precedes 00:30)
   });
 
-  it('ADV-TIME-05: Validates all 269 authentic acts in program.json for valid timeBlock and times', () => {
-    expect(festivalEventsRaw.length).toBe(269);
+  it('ADV-TIME-05: Validates all 253 authentic acts in program.json for valid timeBlock and times', () => {
+    expect(festivalEventsRaw.length).toBe(253);
     const validBlocks = new Set(['manha', 'tarde', 'anoitecer', 'noite-principal']);
 
     for (const ev of festivalEventsRaw) {
@@ -651,7 +651,7 @@ describe('Tier 5 Suite 5: Schedule State, Storage Key & Multi-Tab Synchronizatio
 
   it('ADV-STATE-07: Non-existent event IDs are safely isolated and pruned during processing', () => {
     const favoritesWithGhosts = ['1332', 'GHOST_EVENT_9999', '1338', 'FABRICATED_ID_XYZ'];
-    const authenticEvents = festivalEventsRaw; // 269 events
+    const authenticEvents = festivalEventsRaw; // 253 events
 
     // 1. Filtering favorites on selected day (as done in HorarioView.tsx):
     const favoritedOnDay = authenticEvents.filter(

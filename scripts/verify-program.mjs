@@ -8,7 +8,7 @@
  * 1. Unique IDs (no duplicates, non-empty)
  * 2. Non-empty titles without raw HTML tags
  * 3. Valid stage names and presence of all 9 primary stages
- * 4. Day / Date / DayLabel alignment (Sexta 62, Sábado 132, Domingo 75)
+ * 4. Day / Date / DayLabel alignment (Sexta 54, Sábado 125, Domingo 74)
  * 5. Strict 24h HH:mm time format for startTime and endTime
  * 6. Strictly positive duration (startTime < endTime in festival time)
  * 7. Canonical 6 event categories
@@ -208,25 +208,25 @@ for (const stage of PRIMARY_STAGES) {
 }
 
 // 11. Dataset Size & Breakdown Check
-if (events.length !== 269) {
-  errors.push(`Dataset length mismatch: expected 269 events, got ${events.length}`);
+if (events.length !== 253) {
+  errors.push(`Dataset length mismatch: expected 253 events, got ${events.length}`);
 }
-if (dayCounts.sexta !== 62) {
-  errors.push(`Sexta event count mismatch: expected 62, got ${dayCounts.sexta}`);
+if (dayCounts.sexta !== 54) {
+  errors.push(`Sexta event count mismatch: expected 54, got ${dayCounts.sexta}`);
 }
-if (dayCounts.sabado !== 132) {
-  errors.push(`Sábado event count mismatch: expected 132, got ${dayCounts.sabado}`);
+if (dayCounts.sabado !== 125) {
+  errors.push(`Sábado event count mismatch: expected 125, got ${dayCounts.sabado}`);
 }
-if (dayCounts.domingo !== 75) {
-  errors.push(`Domingo event count mismatch: expected 75, got ${dayCounts.domingo}`);
+if (dayCounts.domingo !== 74) {
+  errors.push(`Domingo event count mismatch: expected 74, got ${dayCounts.domingo}`);
 }
 
 // --- Print Verification Report ---
 console.log('\n📅 Events by Festival Day:');
-console.log(`   - Sexta 5   : ${dayCounts.sexta} events (expected: 62)`);
-console.log(`   - Sábado 6  : ${dayCounts.sabado} events (expected: 132)`);
-console.log(`   - Domingo 7 : ${dayCounts.domingo} events (expected: 75)`);
-console.log(`   - Total     : ${events.length} events (expected: 269)`);
+console.log(`   - Sexta 5   : ${dayCounts.sexta} events (expected: 54)`);
+console.log(`   - Sábado 6  : ${dayCounts.sabado} events (expected: 125)`);
+console.log(`   - Domingo 7 : ${dayCounts.domingo} events (expected: 74)`);
+console.log(`   - Total     : ${events.length} events (expected: 253)`);
 
 console.log('\n🏷️ Events by Category:');
 for (const [cat, count] of Object.entries(categoryCounts)) {

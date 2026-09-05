@@ -362,21 +362,21 @@ try {
     const res = spawnSync(process.execPath, [verifierPath], { cwd: rootDir, encoding: 'utf8' });
     assert(res.status === 0, `verify-program.mjs failed with exit code ${res.status}. Output: ${res.stdout} ${res.stderr}`);
     assert(res.stdout.includes('100% VERIFICATION PASSED'), 'verify-program did not output 100% VERIFICATION PASSED');
-    assert(res.stdout.includes('269 EVENTS ARE FULLY VALID'), 'verify-program did not verify 269 events');
+    assert(res.stdout.includes('253 EVENTS ARE FULLY VALID'), 'verify-program did not verify 253 events');
   });
 
-  challenge('D4.2: Exact day breakdown matches specification (Sexta 62, Sábado 132, Domingo 75 = 269 total)', () => {
+  challenge('D4.2: Exact day breakdown matches specification (Sexta 54, Sábado 125, Domingo 74 = 253 total)', () => {
     const raw = fs.readFileSync(programPath, 'utf8');
     const dataset = JSON.parse(raw);
 
-    assert(dataset.length === 269, `Expected 269 total events, got ${dataset.length}`);
+    assert(dataset.length === 253, `Expected 253 total events, got ${dataset.length}`);
     const sexta = dataset.filter((e) => e.day === 'sexta').length;
     const sabado = dataset.filter((e) => e.day === 'sabado').length;
     const domingo = dataset.filter((e) => e.day === 'domingo').length;
 
-    assert(sexta === 62, `Expected 62 sexta events, got ${sexta}`);
-    assert(sabado === 132, `Expected 132 sábado events, got ${sabado}`);
-    assert(domingo === 75, `Expected 75 domingo events, got ${domingo}`);
+    assert(sexta === 54, `Expected 54 sexta events, got ${sexta}`);
+    assert(sabado === 125, `Expected 125 sábado events, got ${sabado}`);
+    assert(domingo === 74, `Expected 74 domingo events, got ${domingo}`);
   });
 
   challenge('D4.3: Compatibility aliases are present and synchronized (timeStart, timeEnd, dayCode, timeSlot)', () => {

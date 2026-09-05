@@ -2,8 +2,8 @@ import React from 'react';
 import { festivalMinutesToTime } from '../../utils/conflictDetector';
 
 export const TimeAxisHeader: React.FC = () => {
-  // Hours from 10:00 to 02:00 (17 hourly marks: 600, 660, ..., 1560)
-  const hours = Array.from({ length: 17 }, (_, i) => 600 + i * 60);
+  // Hours from 08:00 to 02:00 (19 hourly marks: 480, 540, ..., 1560)
+  const hours = Array.from({ length: 19 }, (_, i) => 480 + i * 60);
 
   return (
     <div className="sticky top-0 z-20 bg-surface/95 backdrop-blur border-b border-border-subtle flex h-10 select-none">
@@ -15,9 +15,9 @@ export const TimeAxisHeader: React.FC = () => {
       </div>
 
       {/* Timeline Ruler */}
-      <div className="relative flex-1 h-full min-w-[2400px]">
+      <div className="relative w-[2400px] shrink-0 h-full">
         {hours.map((minutes) => {
-          const leftPercent = ((minutes - 600) / 960) * 100;
+          const leftPercent = ((minutes - 480) / 1080) * 100;
           const timeLabel = festivalMinutesToTime(minutes);
 
           return (

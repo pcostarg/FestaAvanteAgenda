@@ -352,7 +352,7 @@ export const GrelhaView: React.FC<GrelhaViewProps> = ({
         >
           <div className="relative min-w-max">
             {/* Real-time AGORA Needle Canvas Overlay */}
-            <div className="absolute top-0 bottom-0 left-28 sm:left-36 md:left-40 w-[2400px] pointer-events-none z-20">
+            <div className="absolute top-0 bottom-0 left-28 sm:left-36 md:left-40 w-[2400px] pointer-events-none">
               <AgoraNeedle
                 currentTime={currentTime}
                 percentage={agoraPercentage}
@@ -361,7 +361,11 @@ export const GrelhaView: React.FC<GrelhaViewProps> = ({
             </div>
 
             {/* Sticky Time Ruler */}
-            <TimeAxisHeader />
+            <TimeAxisHeader
+              currentTime={currentTime}
+              agoraPercentage={agoraPercentage}
+              isAgoraActive={isOperatingWindow && isToday}
+            />
 
             {/* Stage Tracks */}
             <div className="divide-y divide-border-subtle/50 min-w-max">

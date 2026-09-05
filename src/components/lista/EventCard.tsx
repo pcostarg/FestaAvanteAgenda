@@ -47,7 +47,7 @@ export const EventCard: React.FC<EventCardProps> = ({
   return (
     <div
       onClick={() => onSelect?.(event)}
-      className={`relative rounded-xl border p-4 transition-all bg-surface-card ${
+      className={`relative rounded-xl border p-4 transition-all bg-surface-card cursor-pointer ${
         isSeen ? 'opacity-60' : 'opacity-100'
       } ${
         hasConflict

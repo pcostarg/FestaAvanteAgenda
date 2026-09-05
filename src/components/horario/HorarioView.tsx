@@ -8,6 +8,7 @@ import { ConflictWarningBanner } from './ConflictWarningBanner';
 import { ConflictResolutionModal } from './ConflictResolutionModal';
 import { EmptyHorarioState } from './EmptyHorarioState';
 import { normalizeDayKey, timeToFestivalMinutes } from '../../utils/conflictDetector';
+import { getFestivalDayFromDate } from '../../hooks/useFestivalTime';
 import { Share2, Download, EyeOff, Sparkles } from 'lucide-react';
 
 export interface HorarioViewProps {
@@ -26,6 +27,8 @@ export interface HorarioViewProps {
   onOpenExport?: () => void;
   onOpenImport?: () => void;
   onSelectEvent?: (event: FestivalEvent) => void;
+  selectedDay?: FestivalDay;
+  onSelectDay?: (day: FestivalDay) => void;
 }
 
 export const HorarioView: React.FC<HorarioViewProps> = ({
@@ -44,8 +47,20 @@ export const HorarioView: React.FC<HorarioViewProps> = ({
   onOpenExport,
   onOpenImport,
   onSelectEvent,
+  selectedDay: propSelectedDay,
+  onSelectDay,
 }) => {
-  const [selectedDay, setSelectedDay] = useState<FestivalDay>('sexta');
+  const [localSelectedDay, setLocalSelectedDay] = useState<FestivalDay>(() => getFestivalDayFromDate(new Date()));
+  const selectedDay = propSelectedDay ?? localSelectedDay;
+
+  const handleDaySwitch = (day: FestivalDay) => {
+    if (onSelectDay) {
+      onSelectDay(day);
+    } else {
+      setLocalSelectedDay(day);
+    }
+  };
+
   const [hideSeen, setHideSeen] = useState<boolean>(false);
   const [isResolverOpen, setIsResolverOpen] = useState<boolean>(false);
 
@@ -124,7 +139,7 @@ export const HorarioView: React.FC<HorarioViewProps> = ({
         <div className="flex flex-wrap items-center gap-2">
           <DaySwitcher
             activeDay={selectedDay}
-            onDayChange={setSelectedDay}
+            onDayChange={handleDaySwitch}
             counts={favoritedDayCounts}
           />
 

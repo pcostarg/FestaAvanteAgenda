@@ -5,6 +5,7 @@ import { DaySwitcher } from './DaySwitcher';
 import { CategoryFilterChips } from './CategoryFilterChips';
 import { TimeBlockSection } from './TimeBlockSection';
 import { normalizeDayKey, timeToFestivalMinutes } from '../../utils/conflictDetector';
+import { getFestivalDayFromDate } from '../../hooks/useFestivalTime';
 import { Search, EyeOff, RotateCcw, Sparkles } from 'lucide-react';
 
 export interface ListaViewProps {
@@ -19,6 +20,8 @@ export interface ListaViewProps {
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
   onSelectEvent?: (event: FestivalEvent) => void;
+  selectedDay?: FestivalDay;
+  onSelectDay?: (day: FestivalDay) => void;
 }
 
 // Unicode NFD diacritic stripping for search
@@ -59,8 +62,20 @@ export const ListaView: React.FC<ListaViewProps> = ({
   searchQuery = '',
   onSearchChange,
   onSelectEvent,
+  selectedDay: propSelectedDay,
+  onSelectDay,
 }) => {
-  const [selectedDay, setSelectedDay] = useState<FestivalDay>('sexta');
+  const [localSelectedDay, setLocalSelectedDay] = useState<FestivalDay>(() => getFestivalDayFromDate(new Date()));
+  const selectedDay = propSelectedDay ?? localSelectedDay;
+
+  const handleDaySwitch = (day: FestivalDay) => {
+    if (onSelectDay) {
+      onSelectDay(day);
+    } else {
+      setLocalSelectedDay(day);
+    }
+  };
+
   const [selectedCategory, setSelectedCategory] = useState<EventCategory | null>(null);
   const [hideSeen, setHideSeen] = useState<boolean>(false);
 
@@ -181,7 +196,7 @@ export const ListaView: React.FC<ListaViewProps> = ({
         {/* Day Switcher */}
         <DaySwitcher
           activeDay={selectedDay}
-          onDayChange={setSelectedDay}
+          onDayChange={handleDaySwitch}
           counts={dayCounts}
         />
       </div>

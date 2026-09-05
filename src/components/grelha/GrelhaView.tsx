@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import type { FestivalDay, FestivalEvent } from '../../types/program';
 import type { ConflictResolutionAction, ConflictReport } from '../../types/schedule';
 import { PRIMARY_STAGES } from '../../types/program';
@@ -7,7 +7,7 @@ import { TimeAxisHeader } from './TimeAxisHeader';
 import { StageTrack } from './StageTrack';
 import { AgoraNeedle } from './AgoraNeedle';
 import { EventDrawer } from './EventDrawer';
-import { useFestivalTime } from '../../hooks/useFestivalTime';
+import { useFestivalTime, getFestivalDayFromDate } from '../../hooks/useFestivalTime';
 import { normalizeDayKey, getEventFestivalMinutes } from '../../utils/conflictDetector';
 
 export type StageCategoryFilter = 'todos' | 'principais' | 'culturais' | 'regionais';
@@ -23,6 +23,13 @@ export interface GrelhaViewProps {
   hasConflict: (id: string, dayDateOrSlug: string, allEvents: FestivalEvent[]) => boolean;
   getConflictsForDay?: (dayDateOrSlug: string, allEvents: FestivalEvent[]) => ConflictReport;
   resolveConflict?: (action: ConflictResolutionAction, evAId: string, evBId: string) => void;
+  selectedDay?: FestivalDay;
+  onSelectDay?: (day: FestivalDay) => void;
+  selectedEvent?: FestivalEvent | null;
+  onSelectEvent?: (event: FestivalEvent | null) => void;
+  isActive?: boolean;
+  initialScrollPos?: { left: number; top: number };
+  onSaveScrollPos?: (pos: { left: number; top: number }) => void;
 }
 
 function getStageCategory(stage: string): 'principais' | 'culturais' | 'regionais' {
@@ -49,6 +56,8 @@ const STAGE_FILTERS: { id: StageCategoryFilter; label: string }[] = [
 
 export const GrelhaView: React.FC<GrelhaViewProps> = ({
   events = FESTIVAL_EVENTS,
+  favorites: _favorites,
+  seen: _seen,
   toggleFavorite,
   toggleSeen,
   isFavorite,
@@ -56,11 +65,29 @@ export const GrelhaView: React.FC<GrelhaViewProps> = ({
   hasConflict,
   getConflictsForDay,
   resolveConflict,
+  selectedDay: propSelectedDay,
+  onSelectDay,
+  selectedEvent: propSelectedEvent,
+  onSelectEvent,
+  isActive: _isActive = true,
+  initialScrollPos,
+  onSaveScrollPos,
 }) => {
-  const [selectedDay, setSelectedDay] = useState<FestivalDay>('sexta');
-  const [selectedEvent, setSelectedEvent] = useState<FestivalEvent | null>(null);
+  const [localSelectedDay, setLocalSelectedDay] = useState<FestivalDay>(() => getFestivalDayFromDate(new Date()));
+  const [localSelectedEvent, setLocalSelectedEvent] = useState<FestivalEvent | null>(null);
   const [stageCategoryFilter, setStageCategoryFilter] = useState<StageCategoryFilter>('todos');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const selectedDay = propSelectedDay ?? localSelectedDay;
+  const selectedEvent = propSelectedEvent !== undefined ? propSelectedEvent : localSelectedEvent;
+
+  const handleSelectEvent = useCallback((event: FestivalEvent | null) => {
+    if (onSelectEvent) {
+      onSelectEvent(event);
+    } else {
+      setLocalSelectedEvent(event);
+    }
+  }, [onSelectEvent]);
 
   const { currentTime, currentMinutes, isOperatingWindow, agoraPercentage, currentDay } = useFestivalTime();
 
@@ -141,11 +168,36 @@ export const GrelhaView: React.FC<GrelhaViewProps> = ({
     return getConflictsForDay ? getConflictsForDay(selectedDay, events) : null;
   }, [getConflictsForDay, selectedDay, events]);
 
+  // Track user scroll position so switching tabs and closing modals does not lose position
+  const gridScrollPosRef = useRef<{ left: number; top: number }>(
+    initialScrollPos && initialScrollPos.left >= 0 ? initialScrollPos : { left: -1, top: -1 }
+  );
+
+  const handleGridScroll = useCallback(() => {
+    if (scrollContainerRef.current) {
+      const pos = {
+        left: scrollContainerRef.current.scrollLeft,
+        top: scrollContainerRef.current.scrollTop,
+      };
+      gridScrollPosRef.current = pos;
+      onSaveScrollPos?.(pos);
+    }
+  }, [onSaveScrollPos]);
+
   // Handle day switch: safely dismisses event drawer if event not on newly selected day
   const handleDaySwitch = (day: FestivalDay) => {
-    setSelectedDay(day);
+    if (onSelectDay) {
+      onSelectDay(day);
+    } else {
+      setLocalSelectedDay(day);
+    }
+    // Explicit user day change -> reset scroll position so it auto-scrolls to day timeline
+    gridScrollPosRef.current = { left: -1, top: -1 };
+    onSaveScrollPos?.({ left: -1, top: -1 });
+    lastScrolledDayRef.current = null;
+
     if (selectedEvent && normalizeDayKey(selectedEvent.day || selectedEvent.date || '') !== day) {
-      setSelectedEvent(null);
+      handleSelectEvent(null);
     }
   };
 
@@ -159,15 +211,26 @@ export const GrelhaView: React.FC<GrelhaViewProps> = ({
   const isToday = selectedDay === currentDay;
 
   // Track last scrolled day to avoid resetting user scroll position on clock ticks
-  const lastScrolledDayRef = useRef<FestivalDay | null>(null);
+  const lastScrolledDayRef = useRef<FestivalDay | null>(
+    gridScrollPosRef.current.left >= 0 ? selectedDay : null
+  );
+
+  // Restore saved scroll position when Grelha view mounts
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container && initialScrollPos && initialScrollPos.left >= 0) {
+      container.scrollLeft = initialScrollPos.left;
+      container.scrollTop = initialScrollPos.top;
+    }
+  }, [initialScrollPos]);
 
   // Initial horizontal auto-scroll to current hour or 10:00/first event, while allowing scrolling back to 08:00
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    if (lastScrolledDayRef.current === selectedDay) {
-      return; // Already scrolled for this day selection
+    if (lastScrolledDayRef.current === selectedDay || gridScrollPosRef.current.left >= 0) {
+      return; // Already scrolled for this day selection or user has scrolled
     }
     lastScrolledDayRef.current = selectedDay;
 
@@ -190,10 +253,13 @@ export const GrelhaView: React.FC<GrelhaViewProps> = ({
     const scrollLeft = Math.max(0, targetPx - 60);
 
     const rafId = requestAnimationFrame(() => {
-      container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+      container.scrollLeft = scrollLeft;
+      const pos = { left: scrollLeft, top: container.scrollTop };
+      gridScrollPosRef.current = pos;
+      onSaveScrollPos?.(pos);
     });
     return () => cancelAnimationFrame(rafId);
-  }, [selectedDay, isToday, isOperatingWindow, currentMinutes, dayEvents]);
+  }, [selectedDay, isToday, isOperatingWindow, currentMinutes, dayEvents, onSaveScrollPos]);
 
   return (
     <section className="space-y-4">
@@ -281,6 +347,7 @@ export const GrelhaView: React.FC<GrelhaViewProps> = ({
       <div className="bg-surface-card rounded-xl border border-border-subtle shadow-card-elevation overflow-hidden">
         <div
           ref={scrollContainerRef}
+          onScroll={handleGridScroll}
           className="overflow-auto max-h-[calc(100vh-14rem)] min-h-[420px] relative"
         >
           {/* Real-time AGORA Needle Canvas Overlay */}
@@ -307,7 +374,7 @@ export const GrelhaView: React.FC<GrelhaViewProps> = ({
                 hasConflict={(id) => hasConflict(id, selectedDay, events)}
                 currentMinutes={currentMinutes}
                 isToday={isToday}
-                onSelectEvent={setSelectedEvent}
+                onSelectEvent={handleSelectEvent}
                 onToggleFavorite={(e, id) => {
                   e.stopPropagation();
                   toggleFavorite(id);
@@ -322,19 +389,21 @@ export const GrelhaView: React.FC<GrelhaViewProps> = ({
         </div>
       </div>
 
-      {/* Event Details Inspector Drawer */}
-      <EventDrawer
-        event={selectedEvent}
-        isOpen={selectedEvent !== null}
-        onClose={() => setSelectedEvent(null)}
-        isFavorite={selectedEvent ? isFavorite(selectedEvent.id) : false}
-        isSeen={selectedEvent ? isSeen(selectedEvent.id) : false}
-        hasConflict={selectedEvent ? hasConflict(selectedEvent.id, selectedDay, events) : false}
-        conflictingEvents={selectedEventConflicts}
-        onToggleFavorite={toggleFavorite}
-        onToggleSeen={toggleSeen}
-        onResolveConflict={resolveConflict}
-      />
+      {/* Local Event Details Inspector Drawer (Fallback for standalone rendering) */}
+      {propSelectedEvent === undefined && (
+        <EventDrawer
+          event={selectedEvent}
+          isOpen={selectedEvent !== null}
+          onClose={() => handleSelectEvent(null)}
+          isFavorite={selectedEvent ? isFavorite(selectedEvent.id) : false}
+          isSeen={selectedEvent ? isSeen(selectedEvent.id) : false}
+          hasConflict={selectedEvent ? hasConflict(selectedEvent.id, selectedDay, events) : false}
+          conflictingEvents={selectedEventConflicts}
+          onToggleFavorite={toggleFavorite}
+          onToggleSeen={toggleSeen}
+          onResolveConflict={resolveConflict}
+        />
+      )}
     </section>
   );
 };

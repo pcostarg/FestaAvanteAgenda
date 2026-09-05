@@ -11,19 +11,35 @@
  *   and history.replaceState cleanup
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Header, ViewMode } from './components/common/Header';
 import { BottomNav } from './components/common/BottomNav';
 import { GrelhaView } from './components/grelha/GrelhaView';
 import { ListaView } from './components/lista/ListaView';
 import { HorarioView } from './components/horario/HorarioView';
+import { EventDrawer } from './components/grelha/EventDrawer';
 import { ExportModal } from './components/sharing/ExportModal';
 import { ImportModal } from './components/sharing/ImportModal';
 import { Toast, ToastData } from './components/common/Toast';
 import { useSchedule } from './hooks/useSchedule';
 import { useKeyboardShortcut } from './hooks/useKeyboardShortcut';
+import { getFestivalDayFromDate } from './hooks/useFestivalTime';
+import { normalizeDayKey } from './utils/conflictDetector';
 import { FESTIVAL_EVENTS } from './data/program';
 import { decodeSharePayload } from './utils/sharePayload';
+import type { FestivalDay, FestivalEvent } from './types/program';
+
+const getInitialFestivalDay = (): FestivalDay => {
+  if (typeof window !== 'undefined') {
+    try {
+      const saved = sessionStorage.getItem('avante_selected_day') as FestivalDay | null;
+      if (saved === 'sexta' || saved === 'sabado' || saved === 'domingo') {
+        return saved;
+      }
+    } catch {}
+  }
+  return getFestivalDayFromDate(new Date());
+};
 
 const parseRouteFromLocation = (): ViewMode => {
   if (typeof window === 'undefined') return 'grelha';
@@ -51,15 +67,58 @@ export const App: React.FC = () => {
   // 1. View Mode State with URL Hash Synchronization
   const [activeView, setActiveView] = useState<ViewMode>(parseRouteFromLocation);
 
+  // 2. Global Festival Day State (Shared across all views & defaulted to today)
+  const [selectedDay, setSelectedDay] = useState<FestivalDay>(getInitialFestivalDay);
+
+  const handleSelectDay = useCallback((day: FestivalDay) => {
+    setSelectedDay(day);
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.setItem('avante_selected_day', day);
+      } catch {}
+    }
+  }, []);
+
+  // 3. Global Event Details Inspector Drawer (Opened across Grelha, Lista & Horário)
+  const [selectedEvent, setSelectedEvent] = useState<FestivalEvent | null>(null);
+
+  const handleOpenEventDrawer = useCallback((event: FestivalEvent | null) => {
+    setSelectedEvent(event);
+    if (event && typeof window !== 'undefined') {
+      try {
+        window.history.pushState({ modal: 'event-details', eventId: event.id }, '');
+      } catch {}
+    }
+  }, []);
+
+  const handleCloseEventDrawer = useCallback(() => {
+    if (typeof window !== 'undefined' && window.history.state?.modal === 'event-details') {
+      window.history.back();
+    } else {
+      setSelectedEvent(null);
+    }
+  }, []);
+
+  // Handle browser Back button closing drawer without losing scroll or view context
+  useEffect(() => {
+    const handlePopState = () => {
+      if (selectedEvent) {
+        setSelectedEvent(null);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [selectedEvent]);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
-  // 2. Sharing & Import/Export Modal States
+  // 4. Sharing & Import/Export Modal States
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
 
-  // 3. Global Toast State
+  // 5. Global Toast State
   const [toast, setToast] = useState<ToastData | null>(null);
 
   const showToast = useCallback(
@@ -69,19 +128,58 @@ export const App: React.FC = () => {
     []
   );
 
-  // 4. User Schedule State & Conflicts Engine
+  // 6. User Schedule State & Conflicts Engine
   const schedule = useSchedule();
 
-  // Sync state to URL hash
-  const handleViewChange = useCallback((view: ViewMode) => {
-    setActiveView(view);
-    const targetHash = view === 'horario' ? 'o-meu-horario' : view;
+  // 7. Track window scroll positions across views
+  const scrollPositions = useRef<Record<ViewMode, number>>({
+    grelha: 0,
+    lista: 0,
+    horario: 0,
+  });
+
+  // Track Grelha 2D matrix scroll position
+  const grelhaScrollPosRef = useRef<{ left: number; top: number }>({ left: -1, top: -1 });
+
+  // Sync state to URL hash and restore scroll position
+  const handleViewChange = useCallback((nextView: ViewMode) => {
+    if (typeof window !== 'undefined') {
+      scrollPositions.current[activeView] = window.scrollY;
+    }
+    setActiveView(nextView);
+    const targetHash = nextView === 'horario' ? 'o-meu-horario' : nextView;
     if (window.location.hash !== `#${targetHash}`) {
       window.location.hash = targetHash;
     }
+    requestAnimationFrame(() => {
+      const savedY = scrollPositions.current[nextView] || 0;
+      window.scrollTo({ top: savedY, behavior: 'instant' });
+    });
+  }, [activeView]);
+
+  // Listen to browser hash changes (back/forward navigation)
+  useEffect(() => {
+    const handleHashChange = () => {
+      const nextView = parseRouteFromLocation();
+      setActiveView((prevView) => {
+        if (prevView !== nextView) {
+          if (typeof window !== 'undefined') {
+            scrollPositions.current[prevView] = window.scrollY;
+          }
+          requestAnimationFrame(() => {
+            const savedY = scrollPositions.current[nextView] || 0;
+            window.scrollTo({ top: savedY, behavior: 'instant' });
+          });
+        }
+        return nextView;
+      });
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  // 5. Startup URL Query Parameter Import (?import=...) (T1-F23-01 to T1-F23-05)
+  // 8. Startup URL Query Parameter Import (?import=...) (T1-F23-01 to T1-F23-05)
   useEffect(() => {
     try {
       if (typeof window === 'undefined') return;
@@ -139,16 +237,6 @@ export const App: React.FC = () => {
     }
   }, [schedule, handleViewChange, showToast]);
 
-  // Listen to browser hash changes (back/forward navigation)
-  useEffect(() => {
-    const handleHashChange = () => {
-      setActiveView(parseRouteFromLocation());
-    };
-
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
-
   // Network Online/Offline Listeners
   useEffect(() => {
     const handleOnline = () => setIsOffline(false);
@@ -176,6 +264,15 @@ export const App: React.FC = () => {
     },
   });
 
+  // Find conflicting events for selectedEvent
+  const selectedEventConflicts = useMemo(() => {
+    if (!selectedEvent) return [];
+    const eventDay = normalizeDayKey(selectedEvent.day || selectedEvent.date || selectedDay);
+    const report = schedule.getConflictsForDay(eventDay, FESTIVAL_EVENTS);
+    const pairs = report.conflictsByEventId.get(selectedEvent.id) || [];
+    return pairs.map((p) => (p.eventA.id === selectedEvent.id ? p.eventB : p.eventA));
+  }, [selectedEvent, selectedDay, schedule]);
+
   return (
     <div className="min-h-screen bg-surface-base text-text-primary flex flex-col font-sans selection:bg-brand-crimson selection:text-text-primary antialiased">
       {/* Top Desktop & Mobile Header with Sharing Triggers */}
@@ -194,7 +291,7 @@ export const App: React.FC = () => {
         onOpenImport={() => setIsImportOpen(true)}
       />
 
-      {/* Main View Area with Responsive Padding */}
+      {/* Main View Area with Preserved Views to keep DOM & Scroll Context */}
       <main className="flex-1 pt-20 pb-24 md:pb-12 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
         {/* VIEW 1: GRELHA DE PALCOS (/grelha) */}
         {activeView === 'grelha' && (
@@ -209,6 +306,14 @@ export const App: React.FC = () => {
             hasConflict={schedule.hasConflict}
             getConflictsForDay={schedule.getConflictsForDay}
             resolveConflict={schedule.resolveConflict}
+            selectedDay={selectedDay}
+            onSelectDay={handleSelectDay}
+            selectedEvent={selectedEvent}
+            onSelectEvent={handleOpenEventDrawer}
+            initialScrollPos={grelhaScrollPosRef.current}
+            onSaveScrollPos={(pos) => {
+              grelhaScrollPosRef.current = pos;
+            }}
           />
         )}
 
@@ -225,6 +330,9 @@ export const App: React.FC = () => {
             hasConflict={schedule.hasConflict}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
+            selectedDay={selectedDay}
+            onSelectDay={handleSelectDay}
+            onSelectEvent={handleOpenEventDrawer}
           />
         )}
 
@@ -241,6 +349,9 @@ export const App: React.FC = () => {
             hasConflict={schedule.hasConflict}
             getConflictsForDay={schedule.getConflictsForDay}
             resolveConflict={schedule.resolveConflict}
+            selectedDay={selectedDay}
+            onSelectDay={handleSelectDay}
+            onSelectEvent={handleOpenEventDrawer}
             onNavigateGrelha={() => handleViewChange('grelha')}
             onNavigateLista={() => handleViewChange('lista')}
             onOpenExport={() => setIsExportOpen(true)}
@@ -248,6 +359,20 @@ export const App: React.FC = () => {
           />
         )}
       </main>
+
+      {/* Global Event Details Inspector Drawer */}
+      <EventDrawer
+        event={selectedEvent}
+        isOpen={selectedEvent !== null}
+        onClose={handleCloseEventDrawer}
+        isFavorite={selectedEvent ? schedule.isFavorite(selectedEvent.id) : false}
+        isSeen={selectedEvent ? schedule.isSeen(selectedEvent.id) : false}
+        hasConflict={selectedEvent ? schedule.hasConflict(selectedEvent.id, selectedDay, FESTIVAL_EVENTS) : false}
+        conflictingEvents={selectedEventConflicts}
+        onToggleFavorite={schedule.toggleFavorite}
+        onToggleSeen={schedule.toggleSeen}
+        onResolveConflict={schedule.resolveConflict}
+      />
 
       {/* Mobile Fixed Bottom Navigation Bar */}
       <BottomNav

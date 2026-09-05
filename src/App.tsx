@@ -408,7 +408,7 @@ export const App: React.FC = () => {
       <footer className="hidden xl:block py-6 border-t border-border-subtle bg-surface text-center text-text-muted text-xs mt-auto">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
           <div>
-            Festa do Avante! 2025 • Quinta da Atalaia, Seixal • 5, 6 e 7 de Setembro
+            Festa do Avante! 2026 • Quinta da Atalaia, Seixal • 4, 5 e 6 de Setembro
           </div>
           <div className="flex items-center gap-4 font-medium">
             <span>PWA Offline-First</span>

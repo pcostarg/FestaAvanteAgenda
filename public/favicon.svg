@@ -53,5 +53,5 @@
 
   <!-- Brand Typography -->
   <text x="256" y="380" text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-weight="800" font-size="44" fill="#F8FAFC" letter-spacing="6">AVANTE</text>
-  <text x="256" y="414" text-anchor="middle" font-family="'Inter', system-ui, sans-serif" font-weight="700" font-size="18" fill="#F59E0B" letter-spacing="8">2025</text>
+  <text x="256" y="414" text-anchor="middle" font-family="'Inter', system-ui, sans-serif" font-weight="700" font-size="18" fill="#F59E0B" letter-spacing="8">2026</text>
 </svg>

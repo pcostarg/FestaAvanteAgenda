@@ -15,7 +15,6 @@ import type {
   TimeBlock,
   FestivalDayMeta,
   FestivalMeta,
-  DayLabel,
 } from '../types/program';
 import { PRIMARY_STAGES, CATEGORIES } from '../types/program';
 
@@ -80,12 +79,10 @@ export const EVENTS_BY_STAGE: Record<string, FestivalEvent[]> = FESTIVAL_EVENTS.
 /**
  * Festival Metadata envelope
  */
-const is2026 = FESTIVAL_EVENTS.some((e) => e.date?.startsWith('2026'));
-
 export const FESTIVAL_META: FestivalMeta = {
-  name: is2026 ? 'Festa do Avante! 2026' : 'Festa do Avante! 2025',
-  year: is2026 ? 2026 : 2025,
-  dates: is2026 ? ['2026-09-04', '2026-09-05', '2026-09-06'] : ['2025-09-05', '2025-09-06', '2025-09-07'],
+  name: 'Festa do Avante! 2026',
+  year: 2026,
+  dates: ['2026-09-04', '2026-09-05', '2026-09-06'],
   location: 'Quinta da Atalaia, Amora, Seixal, Portugal',
   coordinates: {
     lat: 38.6258,
@@ -100,25 +97,25 @@ export const FESTIVAL_DAYS_META: readonly FestivalDayMeta[] = [
   {
     day: 'sexta',
     code: 'fri',
-    date: is2026 ? '2026-09-04' : '2025-09-05',
-    label: (is2026 ? 'Sexta 4' : 'Sexta 5') as DayLabel,
-    shortLabel: is2026 ? 'Sexta, 4 Set' : 'Sexta, 5 Set',
+    date: '2026-09-04',
+    label: 'Sexta 4',
+    shortLabel: 'Sexta, 4 Set',
     operatingHours: '18:00 – 02:00',
   },
   {
     day: 'sabado',
     code: 'sat',
-    date: is2026 ? '2026-09-05' : '2025-09-06',
-    label: (is2026 ? 'Sábado 5' : 'Sábado 6') as DayLabel,
-    shortLabel: is2026 ? 'Sábado, 5 Set' : 'Sábado, 6 Set',
+    date: '2026-09-05',
+    label: 'Sábado 5',
+    shortLabel: 'Sábado, 5 Set',
     operatingHours: '10:00 – 02:00',
   },
   {
     day: 'domingo',
     code: 'sun',
-    date: is2026 ? '2026-09-06' : '2025-09-07',
-    label: (is2026 ? 'Domingo 6' : 'Domingo 7') as DayLabel,
-    shortLabel: is2026 ? 'Domingo, 6 Set' : 'Domingo, 7 Set',
+    date: '2026-09-06',
+    label: 'Domingo 6',
+    shortLabel: 'Domingo, 6 Set',
     operatingHours: '10:00 – 23:00',
   },
 ];

@@ -27,9 +27,9 @@ export default defineConfig({
       ],
       manifest: {
         id: base,
-        name: 'Festa do Avante! 2025 — Agenda & Horários',
-        short_name: 'Avante 2025',
-        description: 'Guia e agenda offline dos concertos, debates e espetáculos da Festa do Avante! 2025',
+        name: 'Festa do Avante! 2026 — Agenda & Horários',
+        short_name: 'Avante 2026',
+        description: 'Guia e agenda offline dos concertos, debates e espetáculos da Festa do Avante! 2026',
         theme_color: '#0B0D0F',
         background_color: '#0B0D0F',
         display: 'standalone',

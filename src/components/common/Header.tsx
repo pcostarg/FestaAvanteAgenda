@@ -110,11 +110,11 @@ export const Header: React.FC<HeaderProps> = ({
                 Festa do Avante!
               </span>
               <span className="font-mono text-xs md:text-sm font-bold text-brand-amber bg-surface-container px-1.5 py-0.5 rounded border border-border-subtle">
-                2025
+                2026
               </span>
             </div>
             <span className="text-[10px] md:text-xs text-brand-crimson-bright font-bold uppercase tracking-wider">
-              5 • 6 • 7 Setembro • Atalaia
+              4 • 5 • 6 Setembro • Atalaia
             </span>
           </div>
         </div>

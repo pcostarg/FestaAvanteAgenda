@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="utf-8" />
+    <title>Festa do Avante! 2025 — A redirecionar...</title>
+    <script>
+      // Single Page Apps for GitHub Pages
+      // Redirects 404 routes back to SPA root with path, search params, and hash fragment preserved
+      var pathSegmentsToKeep = 1;
+      var l = window.location;
+
+      // Extract repository base path (e.g., '/FestaAvanteAgenda')
+      var repoBase = l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/');
+
+      // Extract route segments after repo base, filtering out empty entries
+      var routeSegments = l.pathname
+        .slice(1)
+        .split('/')
+        .slice(pathSegmentsToKeep)
+        .filter(function(seg) { return seg.length > 0; });
+      var routePath = routeSegments.join('/');
+
+      // Search parameters MUST precede hash fragment so window.location.search is populated
+      var targetSearch = l.search ? l.search : '';
+      var targetHash = '';
+      if (routePath) {
+        targetHash = '#' + routePath;
+        if (l.hash && l.hash !== '#' + routePath) {
+          targetHash += (l.hash.charAt(0) === '#' ? l.hash : '#' + l.hash);
+        }
+      } else if (l.hash) {
+        targetHash = l.hash;
+      }
+
+      var targetUrl = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        repoBase + '/' + targetSearch + targetHash;
+
+      window.location.replace(targetUrl);
+    </script>
+  </head>
+  <body style="background-color: #0B0D0F; color: #F8FAFC; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
+    <p>A redirecionar para a Festa do Avante! 2025...</p>
+  </body>
+</html>
